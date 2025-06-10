@@ -1,0 +1,40 @@
+# Rider
+.idea/
+*.sln.DotSettings.user
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/dictionaries
+.idea/httpRequests
+.idea/httpRequestsHosts.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+/bin/
+/obj/
+/out/
+/publish/
+/TestResults/
+
+# NuGet
+*.nupkg
+packages/
+*.snupkg
+
+# ASP.NET Core
+appsettings.Development.json
+secrets.json
+.vscode/
+
+# Rider-specific caches
+*.DotCover.*
+.idea/*/dataSource*
