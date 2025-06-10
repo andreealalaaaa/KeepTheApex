@@ -51,25 +51,6 @@ public class FeedService : IFeedService
     }
 }
 
-public class MediaService : IMediaService
-{
-    private readonly BlobContainerClient _containerClient;
-    public MediaService(BlobServiceClient blobServiceClient)
-    {
-        _containerClient = blobServiceClient.GetBlobContainerClient("media");
-    }
-
-    public async Task<string> UploadMediaAsync(IFormFile file)
-    {
-        var blobClient = _containerClient.GetBlobClient(Guid.NewGuid() + Path.GetExtension(file.FileName));
-        using (var stream = file.OpenReadStream())
-        {
-            await blobClient.UploadAsync(stream, true);
-        }
-        return blobClient.Uri.ToString();
-    }
-}
-
 public class NotificationService : INotificationService
 {
     private readonly NotificationHubClient _hubClient;

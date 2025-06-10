@@ -19,7 +19,12 @@ public interface IPostService
 }
 
 
-public interface IMediaService { }
+public interface IMediaService
+{
+    Task<string> UploadMediaAsync(IFormFile file);
+    Task<Stream?> GetMediaAsync(string fileName);
+    Task<Stream?> GetMediaByUrlAsync(string url);
+}
 public interface INotificationService { }
 public interface IFeedService { }
 

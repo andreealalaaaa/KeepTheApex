@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Azure.Storage.Blobs;
+using KeepTheApex;
 using KeepTheApex.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.NotificationHubs;
@@ -88,6 +89,8 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
+    
+    options.OperationFilter<SwaggerFileUploadOperationFilter>();
 });
 
 
