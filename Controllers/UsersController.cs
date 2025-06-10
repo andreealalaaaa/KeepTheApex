@@ -1,6 +1,7 @@
 using KeepTheApex.DTOs;
 using KeepTheApex.Services;
 using Microsoft.AspNetCore.Mvc;
+using User = KeepTheApex.Models.User;
 
 namespace KeepTheApex.Controllers;
 
@@ -29,5 +30,32 @@ public class UsersController: ControllerBase
     {
         await _userService.UpdateFavoritesAsync(id, dto.FavoriteTeams, dto.FavoriteDrivers);
         return NoContent();
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateUser([FromBody] UserDto newUser)
+    {
+        var user = new User
+        {
+            Id = newUser.UserId,
+            UserId = newUser.UserId,
+            Username = newUser.Username,
+            Role = newUser.Role,
+            FavoriteTeams = newUser.FavoriteTeams ,
+            FavoriteDrivers = newUser.FavoriteDrivers,
+            RepostedPostIds = newUser.RepostedPostIds,
+            LikedPostIds = newUser.LikedPostIds
+        };
+
+        try
+        {
+            await _userService.CreateUserAsync(user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating user: " + ex.Message);
+            return StatusCode(500, "Failed to create user.");
+        }
     }
 }

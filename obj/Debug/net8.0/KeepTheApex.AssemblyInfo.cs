@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KeepTheApex")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5deb5d276a29a9257cbfa57e9347a353a3508eaf")]
 [assembly: System.Reflection.AssemblyProductAttribute("KeepTheApex")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KeepTheApex")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
