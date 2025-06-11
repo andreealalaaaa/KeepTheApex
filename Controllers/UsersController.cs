@@ -10,6 +10,7 @@ namespace KeepTheApex.Controllers;
 public class UsersController: ControllerBase
 {
     private readonly IUserService _userService;
+    
     public UsersController(IUserService userService)
     {
         _userService = userService;
@@ -22,6 +23,14 @@ public class UsersController: ControllerBase
         var user = await _userService.GetUserByIdAsync(id);
         if (user == null) return NotFound();
         return Ok(user);
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<List<User>>> GetAllUsers()
+    {
+        var users = await _userService.GetAllUsersAsync();
+        if (users == null || !users.Any()) return NotFound();
+        return Ok(users);
     }
 
     // PUT /api/users/{id}/favorites

@@ -8,6 +8,10 @@ public interface IUserService
     Task<UserDto?> GetUserByIdAsync(string id);
     Task UpdateFavoritesAsync(string id, List<string> teams, List<string> drivers);
     Task CreateUserAsync(User user);
+    //Task<string> LoginAsync(LoginDto dto);
+    Task<List<User>> GetAllUsersAsync();
+    //Task CreateUserAsync(RegisterUserDto user);
+
 }
 
 public interface IPostService

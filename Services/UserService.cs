@@ -1,4 +1,5 @@
 using KeepTheApex.DTOs;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Azure.Cosmos;
 using User = KeepTheApex.Models.User;
 
@@ -7,9 +8,13 @@ namespace KeepTheApex.Services;
 public class UserService : IUserService
 {
     private readonly Container _container;
-
-    public UserService(CosmosClient cosmosClient)
+    private readonly PasswordHasher<User> _hasher;
+    private readonly IConfiguration _config;
+    
+    public UserService(CosmosClient cosmosClient, IConfiguration config)
     {
+        _hasher  = new PasswordHasher<User>();
+        _config  = config;
         var databaseId = "KeepTheApexDb";
         var containerId = "Users";
         var partitionKeyPath = "/userId";
@@ -87,4 +92,18 @@ public class UserService : IUserService
         await _container.CreateItemAsync(user, new PartitionKey(user.UserId));
     }
 
+    public async Task<List<User>> GetAllUsersAsync()
+    {
+        var query = new QueryDefinition("SELECT * FROM c");
+        var iterator = _container.GetItemQueryIterator<User>(query);
+        var users = new List<User>();
+
+        while (iterator.HasMoreResults)
+        {
+            var response = await iterator.ReadNextAsync();
+            users.AddRange(response);
+        }
+
+        return users;
+    }
 }
