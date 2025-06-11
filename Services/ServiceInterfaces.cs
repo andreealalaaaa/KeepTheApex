@@ -25,6 +25,14 @@ public interface IMediaService
     Task<Stream?> GetMediaAsync(string fileName);
     Task<Stream?> GetMediaByUrlAsync(string url);
 }
-public interface INotificationService { }
-public interface IFeedService { }
+
+public interface INotificationService
+{
+    Task TriggerNotificationAsync(NotificationTriggerDto dto);
+}
+
+public interface IFeedService
+{
+    Task<List<PostDto>> GetFeedAsync(string? filterType = null, string? filterValue = null);
+}
 

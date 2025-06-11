@@ -1,9 +1,5 @@
-using Azure.Storage.Blobs;
 using KeepTheApex.DTOs;
-using KeepTheApex.Models;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.NotificationHubs;
-using UserModel = KeepTheApex.Models.User;
 using PostModel = KeepTheApex.Models.Post;
 
 namespace KeepTheApex.Services;
@@ -22,9 +18,9 @@ public class FeedService : IFeedService
         if (!string.IsNullOrEmpty(filterType) && !string.IsNullOrEmpty(filterValue))
         {
             if (filterType == "team")
-                query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.teamsMentioned, '{filterValue}')";
+                query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.Content, '{filterValue}')";
             else if (filterType == "driver")
-                query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.driversMentioned, '{filterValue}')";
+                query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.Content, '{filterValue}')";
             else if (filterType == "event")
                 query = $"SELECT * FROM c WHERE c.event = '{filterValue}'";
         }
@@ -48,22 +44,5 @@ public class FeedService : IFeedService
             }
         }
         return results.OrderByDescending(p => p.Timestamp).ToList();
-    }
-}
-
-public class NotificationService : INotificationService
-{
-    private readonly NotificationHubClient _hubClient;
-    public NotificationService(NotificationHubClient hubClient)
-    {
-        _hubClient = hubClient;
-    }
-
-    public async Task TriggerNotificationAsync(string teamId, string driverId, string postId)
-    {
-        // Example: send a template notification to all users following the team/driver
-        var payload = $"{{ \"teamId\": \"{teamId}\", \"driverId\": \"{driverId}\", \"postId\": \"{postId}\" }}";
-        // In production, use tags for targeting followers
-        await _hubClient.SendFcmNativeNotificationAsync(payload);
     }
 }

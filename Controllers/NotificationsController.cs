@@ -17,8 +17,13 @@ public class NotificationsController: ControllerBase
     // POST /api/notifications/trigger
     [HttpPost("trigger")]
     public async Task<IActionResult> TriggerNotification([FromBody] NotificationTriggerDto dto)
-    {
-        // Implementation will call _notificationService
+    { 
+        if(dto == null || (string.IsNullOrEmpty(dto.TeamId) && string.IsNullOrEmpty(dto.DriverId)))
+        {
+            return BadRequest("Invalid notification trigger data.");
+        }
+        
+        await _notificationService.TriggerNotificationAsync(dto);
         return NoContent();
     }
 }
