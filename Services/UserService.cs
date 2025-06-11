@@ -9,12 +9,10 @@ public class UserService : IUserService
 {
     private readonly Container _container;
     private readonly PasswordHasher<User> _hasher;
-    private readonly IConfiguration _config;
     
-    public UserService(CosmosClient cosmosClient, IConfiguration config)
+    public UserService(CosmosClient cosmosClient)
     {
         _hasher  = new PasswordHasher<User>();
-        _config  = config;
         var databaseId = "KeepTheApexDb";
         var containerId = "Users";
         var partitionKeyPath = "/userId";
@@ -105,5 +103,69 @@ public class UserService : IUserService
         }
 
         return users;
+    }
+    
+    public async Task<UserDto> RegisterUserAsync(RegisterUserDto dto)
+    {
+        // 1) build domain model
+        var id   = Guid.NewGuid().ToString();
+        var user = new User
+        {
+            Id                 = id,
+            UserId             = id,
+            Username           = dto.FullName,
+            Email              = dto.Email,
+            Role               = dto.Role,
+            FavoriteTeams      = new List<string>(),
+            FavoriteDrivers    = new List<string>(),
+            RepostedPostIds    = new List<string>(),
+            LikedPostIds       = new List<string>()
+        };
+
+        // 2) hash & store
+        user.PasswordHash = _hasher.HashPassword(user, dto.Password);
+        await _container.CreateItemAsync(user, new PartitionKey(user.UserId));
+
+        // 3) return a DTO (without the hash!)
+        return new UserDto
+        {
+            UserId           = user.UserId,
+            Username         = user.Username,
+            Role             = user.Role,
+            FavoriteTeams    = user.FavoriteTeams,
+            FavoriteDrivers  = user.FavoriteDrivers,
+            RepostedPostIds  = user.RepostedPostIds,
+            LikedPostIds     = user.LikedPostIds
+        };
+    }
+    
+    public async Task<UserDto?> LoginAsync(LoginDto dto)
+    {
+        // find by email
+        var queryText = "SELECT * FROM c WHERE c.email = @email";
+        var queryDef  = new QueryDefinition(queryText)
+            .WithParameter("@email", dto.Email);
+        var it        = _container.GetItemQueryIterator<User>(queryDef);
+        var results   = await it.ReadNextAsync();
+        var user      = results.FirstOrDefault();
+        if (user == null)
+            return null;
+
+        // verify password
+        var check = _hasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
+        if (check == PasswordVerificationResult.Failed)
+            return null;
+
+        // return the same DTO shape as GetUser
+        return new UserDto
+        {
+            UserId           = user.UserId,
+            Username         = user.Username,
+            Role             = user.Role,
+            FavoriteTeams    = user.FavoriteTeams,
+            FavoriteDrivers  = user.FavoriteDrivers,
+            RepostedPostIds  = user.RepostedPostIds,
+            LikedPostIds     = user.LikedPostIds
+        };
     }
 }

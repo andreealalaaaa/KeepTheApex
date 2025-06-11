@@ -32,6 +32,34 @@ public class UsersController: ControllerBase
         if (users == null || !users.Any()) return NotFound();
         return Ok(users);
     }
+    
+    // POST /api/users/register
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
+    {
+        try
+        {
+            var created = await _userService.RegisterUserAsync(dto);
+            return CreatedAtAction(nameof(GetUser),
+                new { id = created.UserId },
+                created);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Registration error: " + ex.Message);
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // POST /api/users/login
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    {
+        var user = await _userService.LoginAsync(dto);
+        if (user is null)
+            return Unauthorized("Invalid email or password");
+        return Ok(user);
+    }
 
     // PUT /api/users/{id}/favorites
     [HttpPut("{id}/favorites")]

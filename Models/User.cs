@@ -10,8 +10,12 @@ public class User
     public string UserId { get; set; }
     [JsonProperty("username")]
     public string Username { get; set; }
+    [JsonProperty("email")]
+    public string Email { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string PasswordHash { get; set; }
     [JsonProperty("role")]
-    public string Role { get; set; }
+    public string Role { get; set; } = "user";
     [JsonPropertyName("favoriteTeams")]
     public List<string> FavoriteTeams { get; set; }
     [JsonPropertyName("favoriteDrivers")]
