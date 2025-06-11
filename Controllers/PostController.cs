@@ -14,13 +14,12 @@ namespace KeepTheApex.Controllers;
 public class PostController : ControllerBase
 {
     private readonly IPostService _postService;
-    private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly INotificationService _notificationService;
 
-
-    public PostController(IPostService postService, IHubContext<NotificationHub> hubContext)
+    public PostController(IPostService postService, INotificationService notificationService)
     {
-        _postService = postService;
-        _hubContext = hubContext;
+        _postService = postService; 
+        _notificationService = notificationService;
     }
 
     // GET /api/posts/{id}
@@ -40,12 +39,15 @@ public class PostController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "user";
         var result = await _postService.CreatePostAsync(dto, userId, userRole);
+
+        var notificationDto = new NotificationDto
+        {
+            Topic = "posts",
+            Title = $"Your favourite team has a new post!",
+            Body = "",
+        };
         
-        await _hubContext
-            .Clients
-            .All
-            .SendAsync("ReceiveNotification",
-                "Your favourite team posted!");
+        await _notificationService.SendToTopicAsync(notificationDto.Topic, notificationDto.Title, notificationDto.Body);
         
         return CreatedAtAction(nameof(GetPostById), new { id = result.Id }, result);
     }
