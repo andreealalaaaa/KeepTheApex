@@ -28,7 +28,7 @@ public interface IMediaService
 
 public interface INotificationService
 {
-    Task TriggerNotificationAsync(NotificationTriggerDto dto);
+    Task SendToTopicAsync(string topic, string title, string body, object data = null);
 }
 
 public interface IFeedService

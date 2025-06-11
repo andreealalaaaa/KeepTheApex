@@ -4,15 +4,18 @@ using Azure.Storage.Blobs;
 using KeepTheApex;
 using KeepTheApex.Services;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.NotificationHubs;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using KeepTheApex.Hubs;
+using Microsoft.Azure.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+builder.Services.AddSignalR().AddAzureSignalR();
 
 // Add Authentication
 builder.Services.AddAuthentication("Bearer")
@@ -38,7 +41,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IFeedService, FeedService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
-//mbuilder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 
 // Register Cosmos DB client
 builder.Services.AddSingleton(s =>
@@ -51,12 +55,6 @@ builder.Services.AddSingleton(s =>
 {
     var config = builder.Configuration.GetSection("BlobStorage");
     return new BlobServiceClient(config["ConnectionString"]);
-});
-// Register Notification Hub client
-builder.Services.AddSingleton(s =>
-{
-    var config = builder.Configuration.GetSection("NotificationHub");
-    return NotificationHubClient.CreateClientFromConnectionString(config["ConnectionString"], config["HubName"]);
 });
 
 builder.Services.AddScoped<IPostService, PostService>();
@@ -109,6 +107,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseAzureSignalR(routes =>
+{
+    routes.MapHub<NotificationHub>("/hubs/notifications");
+});
+
 
 app.Run();
 

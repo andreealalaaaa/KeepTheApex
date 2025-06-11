@@ -1,22 +1,24 @@
 using KeepTheApex.DTOs;
+using KeepTheApex.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.NotificationHubs;
 
 namespace KeepTheApex.Services;
 
-public class NotificationService
+public class NotificationService : INotificationService
 {
-    private readonly NotificationHubClient _hubClient;
-    public NotificationService(NotificationHubClient hubClient)
+    private readonly IHubContext<NotificationHub> _hub;
+
+    public NotificationService(IHubContext<NotificationHub> hub )
     {
-        _hubClient = hubClient;
+        _hub = hub;
     }
 
-    public async Task TriggerNotificationAsync(NotificationTriggerDto dto)
+    public async Task SendToTopicAsync(string topic, string title, string body, object data = null)
     {
-        // Example: send a template notification to all users following the team/driver
-        var payload = $"{{ \"teamId\": \"{dto.TeamId}\", \"driverId\": \"{dto.DriverId}\", \"postId\": \"{dto.PostId}\" }}";
-        
-        // In production, use tags for targeting followers
-        await _hubClient.SendFcmNativeNotificationAsync(payload);
+        var payload = new { title, body, data };
+        // Send JSON payload to all connections in the group
+        await _hub.Clients.Group(topic)
+            .SendAsync("ReceiveNotification", payload);
     }
 }
