@@ -10,4 +10,5 @@ public class PostDto
     public DateTime Timestamp { get; set; }
     public List<string> Likes { get; set; }
     public List<string> Reposts { get; set; }
+    public string? RepostOfId { get; set; }
 }

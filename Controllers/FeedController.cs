@@ -15,11 +15,13 @@ public class FeedController: ControllerBase
         _feedService = feedService;
     }
     
-    // GET /api/feed?filter=driver|team|event
+    // GET /api/feed
     [HttpGet]
-    public async Task<ActionResult<List<PostDto>>> GetFeed([FromQuery] string filter, [FromQuery] string value)
+    public async Task<ActionResult<List<PostDto>>> GetFeed(
+        [FromQuery] string? filter = null,
+        [FromQuery] string? value  = null)
     {
-        // Implementation will call _feedService
-        return Ok();
+        var feed = await _feedService.GetFeedAsync(filter, value);
+        return Ok(feed);
     }
 }

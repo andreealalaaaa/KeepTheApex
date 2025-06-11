@@ -1,4 +1,5 @@
 using KeepTheApex.DTOs;
+using KeepTheApex.Models;
 using KeepTheApex.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +14,17 @@ public class NotificationsController: ControllerBase
     {
         _notificationService = notificationService;
     }
-
-    // POST /api/notifications/trigger
-    [HttpPost("trigger")]
-    public async Task<IActionResult> TriggerNotification([FromBody] NotificationTriggerDto dto)
+    
+    [HttpPost]
+    public async Task<IActionResult> Test([FromBody] NotificationDto notificationDto)
     {
-        // Implementation will call _notificationService
+        if (notificationDto == null || string.IsNullOrEmpty(notificationDto.Topic) ||
+            string.IsNullOrEmpty(notificationDto.Title))
+        {
+            return BadRequest("Invalid notification data");
+        }
+
+        await _notificationService.SendToTopicAsync(notificationDto.Topic, notificationDto.Title, notificationDto.Body);
         return NoContent();
     }
 }
