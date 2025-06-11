@@ -39,10 +39,10 @@ public class PostController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "user";
         var result = await _postService.CreatePostAsync(dto, userId, userRole);
-
+        
         var notificationDto = new NotificationDto
         {
-            Topic = "posts",
+            Topic = "fp1",
             Title = $"Your favourite team has a new post!",
             Body = "",
         };
