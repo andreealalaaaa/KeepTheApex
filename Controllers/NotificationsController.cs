@@ -15,14 +15,16 @@ public class NotificationsController: ControllerBase
         _notificationService = notificationService;
     }
     
-    [HttpPost("test")]
-    public async Task<IActionResult> Test()//([FromBody] string topic, string title, string body)
+    [HttpPost]
+    public async Task<IActionResult> Test([FromBody] NotificationDto notificationDto)
     {
-        var topic1 = "fp1";
-        var title1= "Fastest Lap!";
-        var body1 = "Piastri set the fastest lap!";
-        
-        await _notificationService.SendToTopicAsync(topic1, title1, body1);
+        if (notificationDto == null || string.IsNullOrEmpty(notificationDto.Topic) ||
+            string.IsNullOrEmpty(notificationDto.Title))
+        {
+            return BadRequest("Invalid notification data");
+        }
+
+        await _notificationService.SendToTopicAsync(notificationDto.Topic, notificationDto.Title, notificationDto.Body);
         return NoContent();
     }
 }

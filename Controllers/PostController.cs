@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using KeepTheApex.DTOs;
+using KeepTheApex.Hubs;
 using KeepTheApex.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace KeepTheApex.Controllers;
 
@@ -12,10 +14,13 @@ namespace KeepTheApex.Controllers;
 public class PostController : ControllerBase
 {
     private readonly IPostService _postService;
+    private readonly IHubContext<NotificationHub> _hubContext;
 
-    public PostController(IPostService postService)
+
+    public PostController(IPostService postService, IHubContext<NotificationHub> hubContext)
     {
         _postService = postService;
+        _hubContext = hubContext;
     }
 
     // GET /api/posts/{id}
@@ -35,6 +40,13 @@ public class PostController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "user";
         var result = await _postService.CreatePostAsync(dto, userId, userRole);
+        
+        await _hubContext
+            .Clients
+            .All
+            .SendAsync("ReceiveNotification",
+                "Your favourite team posted!");
+        
         return CreatedAtAction(nameof(GetPostById), new { id = result.Id }, result);
     }
 
